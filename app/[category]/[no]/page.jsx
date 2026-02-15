@@ -9,7 +9,8 @@ const Home = async ({ params }) => {
 
   try {
     const res = await fetch(
-      `https://api.thenewsapi.com/v1/news/top?api_token=${apiKey}&locale=us&limit=3&categories=${params.category}&page=${params.no}`
+      `https://api.thenewsapi.com/v1/news/top?api_token=${apiKey}&locale=us&limit=3&categories=${params.category}&page=${params.no}`,
+      { next: { revalidate: 86400 } }
     );
 
     if (!res.ok) {
@@ -48,7 +49,7 @@ const Home = async ({ params }) => {
           <div className="flex justify-between md:w-[70vw] md:m-auto mt-10 m-4 text-sm md:text-lg">
             {params.no > 1 ? (
               <Link href={`/${params.category}/${parseInt(params.no) - 1}`}>
-                <div className="btn bg-black text-white p-4  w-fit rounded mt-4">
+                <div className="btn bg-black text-white p-4 w-fit rounded mt-4">
                   Previous Page
                 </div>
               </Link>
@@ -56,7 +57,7 @@ const Home = async ({ params }) => {
               <div></div>
             )}
             <Link href={`/${params.category}/${parseInt(params.no) + 1}`}>
-              <div className="btn bg-black text-white p-4  w-fit rounded mt-4">
+              <div className="btn bg-black text-white p-4 w-fit rounded mt-4">
                 Next Page
               </div>
             </Link>

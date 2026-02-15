@@ -1,4 +1,3 @@
-"use server";
 import Image from "next/image";
 import React from "react";
 const News = ({
@@ -12,7 +11,7 @@ const News = ({
   published_at,
 }: any) => {
   return (
-    <div className="border-2 w-96 shadow-lg  rounded-xl  relative  p-4 my-2">
+    <div className="border-2 w-96 shadow-lg rounded-xl relative p-4 my-2">
       <div key={uuid}>
         <div className="font-extrabold text-2xl line-clamp-2 ">{title}</div>
         <div className="line-clamp-3">{description}</div>
@@ -24,14 +23,20 @@ const News = ({
         {/* <div>{snippet}</div> */}
         <div>{}</div>
         <div className=" overflow-hidden h-[200px] box-content rounded-lg">
-          <Image
-            width={400}
-            height={300}
-            src={image_url}
-            // layout="resonsive"
-            alt="not loaded"
-            className="rounded-lg"
-          />
+          {image_url ? (
+            <Image
+              width={400}
+              height={300}
+              src={image_url}
+              alt={title}
+              className="rounded-lg"
+              priority={false}
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+              No Image
+            </div>
+          )}
         </div>
         <div className="font-semibold text-xs text-zinc-500 italic text-right">
           {"Published at " +
@@ -49,6 +54,7 @@ const News = ({
             className="bg-white text-black border-2 border-black font-semibold p-2 rounded-md hover:bg-black hover:text-white "
             href={url}
             target="_blank"
+            rel="noopener noreferrer"
           >
             Read More
           </a>
