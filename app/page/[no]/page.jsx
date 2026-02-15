@@ -9,7 +9,8 @@ const Home = async ({ params }) => {
   const apiKey = process.env.NEWS_API_KEY;
 
   const res = await fetch(
-    `https://api.thenewsapi.com/v1/news/top?api_token=${apiKey}&locale=us&limit=3&page=${params.no}`
+    `https://api.thenewsapi.com/v1/news/top?api_token=${apiKey}&locale=us&limit=3&page=${params.no}`,
+    { next: { revalidate: 86400 } }
   );
   const news = await res.json();
   if (!res.ok) {
