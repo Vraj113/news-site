@@ -1,12 +1,18 @@
-// app/loading.tsx or pages/loading.tsx
-import NewsSkeleton from "./Skeletons/NewsSkeleton"; // Create a skeleton component
+import NewsSkeleton from "./Skeletons/NewsSkeleton";
+import PageHero from "./components/PageHero";
 
 export default function Loading() {
   return (
-    <div className="flex m-auto md:w-[80vw] justify-center md:justify-between p-4 flex-wrap mt-10 pb-10">
-      <NewsSkeleton />
-      <NewsSkeleton />
-      <NewsSkeleton />
-    </div>
+    <>
+      <PageHero eyebrow="Loading" title="Fetching headlines" />
+      <div className="news-grid">
+        <NewsSkeleton />
+        <NewsSkeleton />
+        <NewsSkeleton />
+        <NewsSkeleton />
+        <NewsSkeleton />
+        <NewsSkeleton />
+      </div>
+    </>
   );
 }

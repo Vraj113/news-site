@@ -1,67 +1,82 @@
 import Image from "next/image";
-import React from "react";
-const News = ({
-  uuid,
-  title,
-  description,
-  snippet,
-  url,
-  source,
-  image_url,
-  published_at,
-}: any) => {
-  return (
-    <div className="border-2 w-96 shadow-lg rounded-xl relative p-4 my-2">
-      <div key={uuid}>
-        <div className="font-extrabold text-2xl line-clamp-2 ">{title}</div>
-        <div className="line-clamp-3">{description}</div>
-        <div className="italic text-right font-bold text-md bg-black w-fit text-white mr-0 ml-auto my-2">
-          {"-"}
-          {source}
-        </div>
 
-        {/* <div>{snippet}</div> */}
-        <div>{}</div>
-        <div className=" overflow-hidden h-[200px] box-content rounded-lg">
-          {image_url ? (
-            <Image
-              width={400}
-              height={300}
-              src={image_url}
-              alt={title}
-              className="rounded-lg"
-              priority={false}
-            />
+type Article = {
+  uuid: string;
+  title: string;
+  description?: string | null;
+  url: string;
+  image_url?: string | null;
+  source?: string | null;
+  published_at?: string | null;
+};
+
+function formatWhen(iso?: string | null) {
+  if (!iso) return "";
+  try {
+    return new Date(iso).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return "";
+  }
+}
+
+export default function News({ article }: { article: Article }) {
+  const { title, description, url, image_url, source, published_at } = article;
+
+  return (
+    <article className="news-card group">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="news-card-media"
+      >
+        {image_url ? (
+          <Image
+            src={image_url}
+            alt=""
+            width={640}
+            height={360}
+            className="news-card-image"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        ) : (
+          <div className="news-card-placeholder">No image</div>
+        )}
+      </a>
+      <div className="news-card-body">
+        {source ? <span className="news-card-source">{source}</span> : null}
+        <h2 className="news-card-title">
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {title}
+          </a>
+        </h2>
+        {description ? (
+          <p className="news-card-desc">{description}</p>
+        ) : null}
+        <div className="news-card-footer">
+          {published_at ? (
+            <time className="news-card-time" dateTime={published_at}>
+              {formatWhen(published_at)}
+            </time>
           ) : (
-            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-              No Image
-            </div>
+            <span />
           )}
-        </div>
-        <div className="font-semibold text-xs text-zinc-500 italic text-right">
-          {"Published at " +
-            new Date(published_at).toLocaleString("en-US", {
-              month: "numeric",
-              day: "numeric",
-              year: "2-digit",
-              hour: "numeric",
-              minute: "numeric",
-              hour12: true,
-            })}
-        </div>
-        <div className="m-auto w-fit my-4">
           <a
-            className="bg-white text-black border-2 border-black font-semibold p-2 rounded-md hover:bg-black hover:text-white "
             href={url}
             target="_blank"
             rel="noopener noreferrer"
+            className="news-card-link"
           >
-            Read More
+            Read story
           </a>
         </div>
       </div>
-    </div>
+    </article>
   );
-};
-
-export default News;
+}

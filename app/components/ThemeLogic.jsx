@@ -1,57 +1,63 @@
-// components/ThemeToggle.js
-
 "use client";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
 
-const ThemeToggle = () => {
+import { useEffect, useState } from "react";
+
+export default function ThemeToggle() {
   const [theme, setTheme] = useState("light");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light";
-    document.documentElement.setAttribute("data-theme", savedTheme);
-    setTheme(savedTheme);
+    const saved = localStorage.getItem("theme");
+    const initial =
+      saved === "dark" || saved === "light"
+        ? saved
+        : window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+    document.documentElement.setAttribute("data-theme", initial);
+    setTheme(initial);
+    setMounted(true);
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-    setTheme(newTheme);
+  const toggle = () => {
+    const next = theme === "light" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("theme", next);
+    setTheme(next);
   };
 
-  return (
-    <div className="flex items-center space-x-4">
-      <label className="relative inline-flex items-center cursor-pointer">
-        <input
-          type="checkbox"
-          className="sr-only"
-          checked={theme === "dark"}
-          onChange={toggleTheme}
-        />
-        {theme === "light" && (
-          <Image
-            width={30}
-            height={30}
-            className="transition-all"
-            src="/moon.png"
-            alt=""
-          />
-        )}
-        {theme === "dark" && (
-          <Image
-            width={30}
-            height={30}
-            className="transition-all"
-            src="/sun.png"
-            alt=""
-          />
-        )}
-        {/* <div className="w-11 h-6 bg-gray-300 rounded-full dark:bg-gray-700"></div> */}
-        {/* <div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 transform dark:translate-x-5"></div> */}
-      </label>
-    </div>
-  );
-};
+  if (!mounted) {
+    return <span className="theme-btn" aria-hidden />;
+  }
 
-export default ThemeToggle;
+  return (
+    <button
+      type="button"
+      className="theme-btn"
+      onClick={toggle}
+      aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+    >
+      {theme === "light" ? (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path
+            d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      ) : (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.75" />
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+    </button>
+  );
+}

@@ -1,90 +1,93 @@
 "use client";
-import Link from "next/link";
-import React, { useState } from "react";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import CountrySelect from "./CountrySelect";
 import ThemeToggle from "./ThemeLogic";
 
-const Navbar = () => {
-  const [navOpen, setNavOpen] = useState(false);
+const links = [
+  { href: "/", label: "Top" },
+  { href: "/sports", label: "Sports" },
+  { href: "/science", label: "Science" },
+  { href: "/business", label: "Business" },
+  { href: "/health", label: "Health" },
+  { href: "/entertainment", label: "Entertainment" },
+  { href: "/tech", label: "Tech" },
+  { href: "/politics", label: "Politics" },
+  { href: "/travel", label: "Travel" },
+];
 
-  const toggleNav = () => setNavOpen(!navOpen);
+export default function Navbar({ country, countryName }) {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href) => {
+    if (href === "/") return pathname === "/";
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
-    <div>
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex gap-x-8 font-bold text-xl p-4 justify-around shadow-md ">
-        <Link href="/">News</Link>
-        <Link href="/sports">Sports</Link>
-        <Link href="/science">Science</Link>
-        <Link href="/business">Business</Link>
-        <Link href="/health">Health</Link>
-        <Link href="/entertainment">Entertainment</Link>
-        <Link href="/tech">Tech</Link>
-        <Link href="/politics">Politics</Link>
-        <Link href="/travel">Travel</Link>
-        <ThemeToggle />
-      </div>
-
-      {/* Mobile Navigation Toggle */}
-      <div className="md:hidden flex items-center p-4 justify-between">
-        <Link href={"/"}>
-          <span className="text-xl font-bold">News</span>
+    <header className="site-header">
+      <div className="shell header-inner">
+        <Link href="/" className="brand" onClick={() => setOpen(false)}>
+          <span className="brand-mark" aria-hidden />
+          <span>
+            <span className="brand-name">News</span>
+            <span className="brand-tag">{countryName}</span>
+          </span>
         </Link>
-        <div className="flex items-center gap-x-2">
+
+        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`nav-link ${isActive(link.href) ? "nav-link-active" : ""}`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-2 sm:gap-3">
+          <CountrySelect value={country} />
           <ThemeToggle />
-          <div className="space-y-2 cursor-pointer" onClick={toggleNav}>
-            <span
-              className={`block w-8 navSpan    h-0.5 bg-black transition-transform ${
-                navOpen ? "transform rotate-45 translate-y-2" : ""
-              }`}
-            ></span>
-            <span
-              className={`block w-8 navSpan    h-0.5 bg-black transition-opacity ${
-                navOpen ? "opacity-0" : ""
-              }`}
-            ></span>
-            <span
-              className={`block w-8 navSpan    h-0.5 bg-black transition-transform ${
-                navOpen ? "transform -rotate-45 -translate-y-3" : ""
-              }`}
-            ></span>
-          </div>
+          <button
+            type="button"
+            className="menu-btn lg:hidden"
+            aria-expanded={open}
+            aria-label="Toggle menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className={open ? "menu-line open" : "menu-line"} />
+            <span className={open ? "menu-line open mid" : "menu-line"} />
+            <span className={open ? "menu-line open" : "menu-line"} />
+          </button>
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       <div
-        className={`${
-          navOpen ? "flex" : "hidden"
-        } flex-col items-center gap-y-6 font-bold text-xl p-4 shadow-lg  md:hidden rounded-br-md rounded-bl-md transition-all  `}
+        className={`mobile-nav-wrap lg:hidden ${open ? "is-open" : ""}`}
+        aria-hidden={!open}
       >
-        <Link href="/sports" onClick={toggleNav}>
-          Sports
-        </Link>
-        <Link href="/science" onClick={toggleNav}>
-          Science
-        </Link>
-        <Link href="/business" onClick={toggleNav}>
-          Business
-        </Link>
-        <Link href="/health" onClick={toggleNav}>
-          Health
-        </Link>
-        <Link href="/entertainment" onClick={toggleNav}>
-          Entertainment
-        </Link>
-        <Link href="/tech" onClick={toggleNav}>
-          Tech
-        </Link>
-        <Link href="/politics" onClick={toggleNav}>
-          Politics
-        </Link>
-        <Link href="/travel" onClick={toggleNav}>
-          Travel
-        </Link>
+        <nav className="mobile-nav" aria-label="Mobile">
+          <div className="px-1 py-2">
+            <CountrySelect value={country} />
+          </div>
+          {links.map((link, i) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`nav-link block animate-nav-item ${isActive(link.href) ? "nav-link-active" : ""}`}
+              style={{ animationDelay: `${i * 40}ms` }}
+              onClick={() => setOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </div>
-    </div>
+    </header>
   );
-};
-
-export default Navbar;
+}

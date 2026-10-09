@@ -1,45 +1,35 @@
-import Link from "next/link";
-import News from "@/app/components/News";
-import { Suspense } from "react";
-import Loading from "../loading";
+import { categoryLabel, fetchTopNews } from "@/lib/fetchNews";
+import { countryLabel } from "@/lib/countries";
+import { getSelectedCountry } from "@/lib/getCountry";
+import NewsFeed from "@/app/components/NewsFeed";
+import PageHero from "@/app/components/PageHero";
+import Pagination from "@/app/components/Pagination";
 
-const Home = async ({ params }) => {
-  const apiKey = process.env.NEWS_API_KEY;
+export async function generateMetadata({ params }) {
+  const label = categoryLabel(params.category);
+  return { title: label };
+}
 
-  const res = await fetch(
-    `https://api.thenewsapi.com/v1/news/top?api_token=${apiKey}&locale=us&limit=3&categories=${params.category}`,
-    { next: { revalidate: 86400 } }
-  );
-  const news = await res.json();
+export default async function CategoryPage({ params }) {
+  const country = getSelectedCountry();
+  const result = await fetchTopNews({
+    category: params.category,
+    page: 1,
+    limit: 9,
+    locale: country,
+  });
+  const label = categoryLabel(params.category);
+  const region = countryLabel(country);
 
   return (
     <>
-      <Suspense fallback={<Loading />}>
-        <div className="flex m-auto md:w-[80vw] justify-center p-4 md:justify-between flex-wrap mt-10">
-          {news.data.map((d) => (
-            <News
-              key={d.uuid}
-              title={d.title}
-              description={d.description}
-              snippet={d.snippet}
-              url={d.url}
-              image_url={d.image_url}
-              published_at={d.published_at}
-              source={d.source}
-            />
-          ))}
-        </div>
-      </Suspense>
-      <div className="flex justify-between md:w-[80vw] md:m-auto mt-10 m-4 text-sm md:text-lg">
-        <div></div>
-        <Link href={`/${params.category}/2`}>
-          <div className="btn bg-black text-white p-4 w-fit rounded mt-4">
-            Next Page
-          </div>
-        </Link>
-      </div>
+      <PageHero
+        eyebrow={`${region} · ${label}`}
+        title={label}
+        description={`Latest ${label.toLowerCase()} coverage from ${region}.`}
+      />
+      <NewsFeed result={result} />
+      <Pagination nextHref={`/${params.category}/2`} />
     </>
   );
-};
-
-export default Home;
+}
